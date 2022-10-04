@@ -96,7 +96,7 @@ specifika pro objekt vlajky tohoto typu
 | type | 4 | 
 | command | příkaz, který se spustí pro ověření splnění úkolu | `bash -c '[ "$(cat /tmp/test.txt)" == "ahoj" ]'`
 | container | cílový kontejner, ve kterém se příkaz bude spouštět | server
-| internval | interval, ve kterém bude docházet ke spuštění příkazu | server
+| internval | interval, ve kterém bude docházet ke spuštění příkazu | 2000
 | exitCode | v případě, že příkaz bude ukončet s touto hodnotou exit kodu, bude vlajka splněna | 0
 
 
