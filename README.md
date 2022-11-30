@@ -4,10 +4,10 @@
     - [Základní principy fungování platformy](#základní-principy-fungování-platformy)
   - [1. Technická specifikace úloh](#1-technická-specifikace-úloh)
     - [`challenge.yaml`](#challengeyaml)
-      - [**dynamická vlajka**](#dynamická-vlajka)
-      - [**statická vlajka**](#statická-vlajka)
-      - [**vlajka s možností výběru odpovědí**](#vlajka-s-možností-výběru-odpovědí)
-      - [**automaticky se vyhodnocující vlajka**](#automaticky-se-vyhodnocující-vlajka)
+      - [dynamická vlajka](#dynamická-vlajka)
+      - [statická vlajka](#statická-vlajka)
+      - [vlajka s možností výběru odpovědí](#vlajka-s-možností-výběru-odpovědí)
+      - [automaticky se vyhodnocující vlajka](#automaticky-se-vyhodnocující-vlajka)
     - [`docker-compose.yaml`](#docker-composeyaml)
       - [Limity](#limity)
       - [Signalizace úspěšného nastartování scénáře](#signalizace-úspěšného-nastartování-scénáře)
@@ -96,6 +96,8 @@ specifika pro objekt vlajky tohoto typu
 | type | 4 | 
 | command | příkaz, který se spustí pro ověření splnění úkolu | `bash -c '[ "$(cat /tmp/test.txt)" == "ahoj" ]'`
 | container | cílový kontejner, ve kterém se příkaz bude spouštět | server
+| shell | shell, ve kterém je příkaz spouštěn | sh
+| user | uživatel, pod kterým je příkaz spoštěn | root
 | internval | interval, ve kterém bude docházet ke spuštění příkazu | 2000
 | exitCode | v případě, že příkaz bude ukončet s touto hodnotou exit kodu, bude vlajka splněna | 0
 
