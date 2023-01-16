@@ -11,6 +11,7 @@
     - [`docker-compose.yaml`](#docker-composeyaml)
       - [Limity](#limity)
       - [Signalizace úspěšného nastartování scénáře](#signalizace-úspěšného-nastartování-scénáře)
+    - [`Vagrantfile`](#vagrantfile)
     - [`DESCRIPTION.md`](#descriptionmd)
       - [Strukutra Markdown](#strukutra-markdown)
       - [Další konvence pro tvorbu zadání](#další-konvence-pro-tvorbu-zadání)
@@ -22,9 +23,22 @@ Systém Haxagon zprostředkovává soutěžícím přístup k soutěžním úloh
 
 ## 1. Technická specifikace úloh
 
+### 1.1 Virtualizace infrastruktury
+V systému Haxagon mohou být úlohy spouštěny pomocí dvou druhů virtualizace:
+
+#### Vagrant
+[Vagrant](https://www.vagrantup.com/) je nástroj pro správu virtuálních strojů, který umožňuje vytvořit, spravovat a automatizovat virtuální prostředí. Je nutné použít [libvirt provider]([https://www.vagrantup.com/docs/providers/libvirt/index.html](https://vagrant-libvirt.github.io/vagrant-libvirt/)) pro spouštění úloh v systému Haxagon.
+
+#### Docker
+[Docker-compose](https://docs.docker.com/compose/) je nástroj pro spouštění a správu aplikací pomocí [Dockeru](https://docs.docker.com/). Umožňuje spouštět více kontejnerů jako jeden celek a řídit je pomocí jednoho konfiguračního souboru.
+
+### 1.2 Struktura repozítáře s úlohou
 Formát úlohy je velice jednoduchý - stačí systému poskytnout následující set souborů v gitovém repozitáři:
 - `challenge.yaml` - Soubor ve formátu YAML, který definuje základní parametry úlohy
-- `docker-compose.yaml` / `docker-compose.yml` - Definice infrastruktury, která se vytvoří pro každou instanci úlohy
+- potřebné zadání pro virtualizačního providera, který vytvoří infrastrukturu pro každou instanci úlohy (podle druhu virtualizace):
+    - Vagrantfile
+    - docker-compose.yaml 
+- `docker-compose.yaml` / `docker-compose.yml` - 
 - `DESCRIPTION.md` -Markdown soubor obsahující zadání pro plnitele 
 - `HANDBOOK.md` - Markdown soubor obsahující obsah, který slouží jako příručka pro učitele
 
@@ -178,6 +192,55 @@ services:
         command: sh -c '/setup.sh && echo SCENARIO_IS_READY && sleep infinity'
         ports:
             - "80:80"
+```
+
+### Vagrantfile
+`Vagrantfile` je konfigurační soubor pro [Vagrant](https://www.vagrantup.com/), který se používá k nastavení virtuálního prostředí pro vaši úlohu. Tento soubor by měl být umístěn ve stejné složce jako `challenge.yaml`.
+
+#### Obsah Vagrantfile
+V `Vagrantfile` může být nastaveno např.:
+- image operačního systému, který se má použít pro virtuální stroj (např. **Ubuntu** nebo **CentOS**)
+- konfigurace **sítě** pro virtuální stroj
+- provisioning
+- omezení prostředků (RAM, CPU, různé IO atp.)
+
+#### Příklad Vagrantfile
+```ruby
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  # Nastavení libvirt provider
+  config.vm.provider :libvirt do |libvirt|
+    libvirt.driver = "kvm"
+  end
+
+  # Nastavení obrayu operačního systému pro virtuální stroj
+  config.vm.box = "ubuntu/focal64"
+
+  # Konfigurace privátní sítě pro virtuální stroj
+  config.vm.network "private_network", ip: "192.168.33.10"
+
+  # Nastavení RAM a CPU pro virtuální stroj
+  config.vm.provider "libvirt" do |vb|
+    vb.memory = "512"
+    vb.cpus = 1
+  end
+
+  # Konfigurace shell provisioningu
+  config.vm.provision "shell" do |s|
+    s.inline = <<-SHELL
+      apt-get update
+      apt-get install -y apache2
+      echo SCENARIO_IS_READY
+    SHELL
+    s.env = {
+      "VARIABLE_NAME" => "value"
+    }
+  end
+end
+
 ```
 
 ### `DESCRIPTION.md`
